@@ -6,31 +6,35 @@ looks especially good when you have multiple notifications defined in a model.
 
 Instead of this:
 
-    class MyModel < ActiveRecord::Base
-      def after_create
-        if alerts_enabled?
-          if MyMailer.respond_to?(:delay)
-            MyMailer.delay.new_widget_alert(get_recipients, self)
-          else
-            MyMailer.new_widget_alert(get_recipients, self).deliver
-          end
-        end
+```ruby
+class MyModel < ActiveRecord::Base
+  def after_create
+    if alerts_enabled?
+      if MyMailer.respond_to?(:delay)
+        MyMailer.delay.new_widget_alert(get_recipients, self)
+      else
+        MyMailer.new_widget_alert(get_recipients, self).deliver
       end
     end
+  end
+end
+```
 
 With acts_as_notifier you write this:
 
-    # in config/initializers/acts_as_notifier.rb
-    ActsAsNotifier::Config.default_mailer = :MyMailer
-    ActsAsNotifier::Config.default_mailer = :new_widget_alert
+```ruby
+# in config/initializers/acts_as_notifier.rb
+ActsAsNotifier::Config.default_mailer = :MyMailer
+ActsAsNotifier::Config.default_mailer = :new_widget_alert
 
-    class MyModel < ActiveRecord::Base
-      acts_as_notifier do
-        after_create do
-          notify :get_recipients, :if => :alerts_enabled?
-        end
-      end
+class MyModel < ActiveRecord::Base
+  acts_as_notifier do
+    after_create do
+      notify :get_recipients, :if => :alerts_enabled?
     end
+  end
+end
+```
 
 ## When Should I Use This?
 
@@ -43,45 +47,53 @@ added complexity.
 
 Add this line to your application's Gemfile:
 
-    gem 'acts_as_notifier'
+```ruby
+gem 'acts_as_notifier'
+```
 
 And then execute:
 
-    $ bundle
+```ruby
+$ bundle
+```
 
 Or install it yourself as:
 
-    $ gem install acts_as_notifier
+```ruby
+$ gem install acts_as_notifier
+```
 
 ## Usage
 
-    # in config/initializers/acts_as_notifier.rb
-    ActsAsNotifier::Config.default_mailer = :MyMailer
-    ActsAsNotifier::Config.default_mailer = :change_notification
+```ruby
+# in config/initializers/acts_as_notifier.rb
+ActsAsNotifier::Config.default_mailer = :MyMailer
+ActsAsNotifier::Config.default_mailer = :change_notification
 
-    # in app/models/my_model.rb
-    class MyModel < ActiveRecord::Base
-      acts_as_notifier do
-        after_create do
-          notify recipients, options
-        end
-        after_update do
-          notify recipients, options
-        end
-        after_save do
-          notify recipients, options
-        end
-      end
+# in app/models/my_model.rb
+class MyModel < ActiveRecord::Base
+  acts_as_notifier do
+    after_create do
+      notify recipients, options
     end
-
-    # in app/mailers/my_mailer.rb
-    class MyMailer < ActionMailer::Base
-      default from: 'test@example.com'
-
-      def change_notification(recipients, model)
-        mail(to: recipients, subject: "A #{model.class} with ID #{model.id} was changed")
-      end
+    after_update do
+      notify recipients, options
     end
+    after_save do
+      notify recipients, options
+    end
+  end
+end
+
+# in app/mailers/my_mailer.rb
+class MyMailer < ActionMailer::Base
+  default from: 'test@example.com'
+
+  def change_notification(recipients, model)
+    mail(to: recipients, subject: "A #{model.class} with ID #{model.id} was changed")
+  end
+end
+```
 
 ### recipients
 
@@ -91,61 +103,66 @@ Note that to make sure you get the up-to-date recipients at runtime, you will no
 
 Examples:
 
-    notify 'bob@somewhere.com', options
-    notify :find_admin_users, options
+```ruby
+notify 'bob@somewhere.com', options
+notify :find_admin_users, options
 
-    # note use of a proc to lazy-evaluate the ActiveRecord query
-    notify Proc.new { User.where(:should_notify, true) }, options
+# note use of a proc to lazy-evaluate the ActiveRecord query
+notify Proc.new { User.where(:should_notify, true) }, options
 
-    # pass yourself custom options in addition to the acts_as_notifiers options
-    notify :get_recipients, :role => :admins
-    def self.get_recipients(options)
-      User.find_all_by_role(options[:role])
-    end
+# pass yourself custom options in addition to the acts_as_notifiers options
+notify :get_recipients, :role => :admins
+def self.get_recipients(options)
+  User.find_all_by_role(options[:role])
+end
+```
 
 ### options
 
-:if | A string, proc, or name of a method that must evaluate to a truthy value in order for the notification to be sent. Procs and strings are evaluated in the context of the model instance. Procs are be passed the options hash as a parameter.
-:mailer | A class inheriting from ActionMailer::Base, may be a string or symbol or actual class.
-:method | Mailer method to invoke. Should accept recipients string and the ActiveRecord model as params.
-custom | Any additional options will be saved and passed to :if and recipients procs.
+| :if | A string, proc, or name of a method that must evaluate to a truthy value in order for the notification to be sent. Procs and strings are evaluated in the context of the model instance. Procs are be passed the options hash as a parameter. |
+| :mailer | A class inheriting from ActionMailer::Base, may be a string or symbol or actual class. |
+| :method | Mailer method to invoke. Should accept recipients string and the ActiveRecord model as params. |
+| custom | Any additional options will be saved and passed to :if and recipients procs. |
 
 Examples:
 
-    acts_as_notifier do
-      after_create do
-        # different ways of specifying :if condition
-        notify :recipients, :if => 'alerts_enabled?'
-        notify :recipients, :if => :alerts_enabled?
-        notify :recipients, :if => proc { alerts_enabled? }
 
-        # passing your own custom option to an if condition proc
-        notify :recipients, :if => proc {|opts| alerts_enabled_for_role?(opts[:role]) }, :role => :admin
+```ruby
+acts_as_notifier do
+  after_create do
+    # different ways of specifying :if condition
+    notify :recipients, :if => 'alerts_enabled?'
+    notify :recipients, :if => :alerts_enabled?
+    notify :recipients, :if => proc { alerts_enabled? }
 
-        # specifying a mailer
-        notify :recipients, :mailer => 'MyMailer'
-        notify :recipients, :mailer => :MyMailer
-        notify :recipients, :mailer => MyMailer
+    # passing your own custom option to an if condition proc
+    notify :recipients, :if => proc {|opts| alerts_enabled_for_role?(opts[:role]) }, :role => :admin
 
-        # specifying mailer method (in MyMailer class, def new_record_notification(recipients, model))
-        notify :recipients, :mailer => MyMailer, :method => :new_record_notification
+    # specifying a mailer
+    notify :recipients, :mailer => 'MyMailer'
+    notify :recipients, :mailer => :MyMailer
+    notify :recipients, :mailer => MyMailer
 
-        # complete example
-        notify proc { User.where(wants_alerts: true) }, :if => :alerts_enabled?, :mailer => MyMailer, :method => :new_widget_alert
-      end
-                                                                                      x
-      # another complete example
-      after_save do
-        notify :owner, :if => ->(widget){ widget.broken? }, :mailer => MyMailer, :method => :broken_widget_alert
-      end
-    end
+    # specifying mailer method (in MyMailer class, def new_record_notification(recipients, model))
+    notify :recipients, :mailer => MyMailer, :method => :new_record_notification
+
+    # complete example
+    notify proc { User.where(wants_alerts: true) }, :if => :alerts_enabled?, :mailer => MyMailer, :method => :new_widget_alert
+  end
+                                                                                  x
+  # another complete example
+  after_save do
+    notify :owner, :if => ->(widget){ widget.broken? }, :mailer => MyMailer, :method => :broken_widget_alert
+  end
+end
+```
 
 ## Configuration
 
-ActsAsNotifier::Config.use_delayed_job = | true/false
-ActsAsNotifier::Config.default_mailer  = | class inheriting from ActionMailer::Base
-ActsAsNotifier::Config.default_method  = | mailer method to invoke, takes recipient string and ActiveRecord model as params
-ActsAsNotifier::Config.disabled        = | true/false, can be globally enabled or disabled at any time
+| `ActsAsNotifier::Config.use_delayed_job =` | true/false |
+| `ActsAsNotifier::Config.default_mailer  =` | class inheriting from ActionMailer::Base |
+| `ActsAsNotifier::Config.default_method  =` | mailer method to invoke, takes recipient string and ActiveRecord model as params |
+| `ActsAsNotifier::Config.disabled        =` | true/false, can be globally enabled or disabled at any time |
 
 ## Contributing
 

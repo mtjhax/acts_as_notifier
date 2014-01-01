@@ -160,10 +160,10 @@ end
 ## Configuration
 
 <table>
-<tr><td>`ActsAsNotifier::Config.use_delayed_job =`</td><td>true/false</td></tr>
-<tr><td>`ActsAsNotifier::Config.default_mailer  =`</td><td>class inheriting from ActionMailer::Base</td></tr>
-<tr><td>`ActsAsNotifier::Config.default_method  =`</td><td>mailer method to invoke, takes recipient string and ActiveRecord model as params</td></tr>
-<tr><td>`ActsAsNotifier::Config.disabled        =`</td><td>true/false, can be globally enabled or disabled at any time</td></tr>
+<tr><td>ActsAsNotifier::Config.use_delayed_job =</td><td>true/false</td></tr>
+<tr><td>ActsAsNotifier::Config.default_mailer =</td><td>class inheriting from ActionMailer::Base</td></tr>
+<tr><td>ActsAsNotifier::Config.default_method =</td><td>mailer method to invoke, takes recipient string and ActiveRecord model as params</td></tr>
+<tr><td>ActsAsNotifier::Config.disabled =</td><td>true/false, can be globally enabled or disabled at any time</td></tr>
 </table>
 
 ## Contributing

@@ -119,10 +119,12 @@ end
 
 ### options
 
-| :if | A string, proc, or name of a method that must evaluate to a truthy value in order for the notification to be sent. Procs and strings are evaluated in the context of the model instance. Procs are be passed the options hash as a parameter. |
-| :mailer | A class inheriting from ActionMailer::Base, may be a string or symbol or actual class. |
-| :method | Mailer method to invoke. Should accept recipients string and the ActiveRecord model as params. |
-| custom | Any additional options will be saved and passed to :if and recipients procs. |
+<table>
+<tr><td>:if</td><td>A string, proc, or name of a method that must evaluate to a truthy value in order for the notification to be sent. Procs and strings are evaluated in the context of the model instance. Procs are be passed the options hash as a parameter.</td></tr>
+<tr><td>:mailer</td><td>A class inheriting from ActionMailer::Base, may be a string or symbol or actual class.</td></tr>
+<tr><td>:method</td><td>Mailer method to invoke. Should accept recipients string and the ActiveRecord model as params.</td></tr>
+<tr><td>custom</td><td>Any additional options will be saved and passed to :if and recipients procs.</td></tr>
+</table>
 
 Examples:
 

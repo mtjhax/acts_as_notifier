@@ -68,19 +68,19 @@ $ gem install acts_as_notifier
 ```ruby
 # in config/initializers/acts_as_notifier.rb
 ActsAsNotifier::Config.default_mailer = :MyMailer
-ActsAsNotifier::Config.default_mailer = :change_notification
+ActsAsNotifier::Config.default_method = :change_notification
 
 # in app/models/my_model.rb
 class MyModel < ActiveRecord::Base
   acts_as_notifier do
     after_create do
-      notify recipients, options
+      notify &laquo;recipients&raquo;, &laquo;options&raquo;  # see definitions below
     end
     after_update do
-      notify recipients, options
+      notify &laquo;recipients&raquo;, &laquo;options&raquo;  # see definitions below
     end
     after_save do
-      notify recipients, options
+      notify &laquo;recipients&raquo;, &laquo;options&raquo;  # see definitions below
     end
   end
 end

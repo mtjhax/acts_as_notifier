@@ -74,13 +74,13 @@ ActsAsNotifier::Config.default_method = :change_notification
 class MyModel < ActiveRecord::Base
   acts_as_notifier do
     after_create do
-      notify &laquo;recipients&raquo;, &laquo;options&raquo;  # see definitions below
+      notify &#171;recipients&#187;, &#171;options&#187;  # see definitions below
     end
     after_update do
-      notify &laquo;recipients&raquo;, &laquo;options&raquo;  # see definitions below
+      notify &#171;recipients&#187;, &#171;options&#187;  # see definitions below
     end
     after_save do
-      notify &laquo;recipients&raquo;, &laquo;options&raquo;  # see definitions below
+      notify &#171;recipients&#187;, &#171;options&#187;  # see definitions below
     end
   end
 end
